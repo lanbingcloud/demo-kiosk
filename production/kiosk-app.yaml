@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kiosk
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: demo-kiosk
+  source:
+    chart: kiosk
+    repoURL: https://charts.devspace.sh/
+    targetRevision: 0.2.11
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kiosk
+  ignoreDifferences:
+  - group: "rbac.authorization.k8s.io"
+    kind: "ClusterRole"
+    name: "kiosk-space-admin"
+    jsonPointers:
+    - /rules
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+
